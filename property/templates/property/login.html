@@ -1,0 +1,44 @@
+
+{% extends 'property/layout.html' %}
+
+{# Load the tag library #}
+{% load django_bootstrap5 %}
+
+
+{% block title %}login{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row justify-content-md-center">
+            <div class="col col-lg-2"></div>
+            <div class="col-md-auto">    
+                <h2>Login</h2>
+
+                    {% if message %}
+                        <div>{{ message }}</div>
+                    {% endif %}
+
+                    <div>
+                        <form action="{% url 'login' %}" method="post">
+                            {% csrf_token %}
+                            <div>
+                                <label for="login_input">Username or Email:</label>
+                                <input autofocus type="text" class="form-control" name="login_input" placeholder="Enter username or email" aria-label="login_input" required>
+                                <!-- <input autofocus type="text" name="login_input" placeholder="Enter username or email" required> -->
+                            </div>
+                            <div>
+                                <label for="password">Password:</label>
+                                <input type="password" class="form-control" name="password" placeholder="password" aria-label="password" required>
+                                <!-- <input type="password" name="password" required> -->
+                            </div>
+                            {% bootstrap_button button_type="submit" content="Login" %}
+                            <!-- <button type="submit">Login</button> -->
+                        </form>
+                    </div>
+
+                    <div><p>Don't have an account yet? <a href="{% url 'register' %}">Register an account here</a></p></div>
+            </div>
+            <div class="col col-lg-2"></div>
+        </div>        
+    </div>
+{% endblock %}
