@@ -11,10 +11,13 @@ from phonenumber_field.widgets import PhoneNumberPrefixWidget
 
 class UserForm(UserCreationForm):
     phone_number = PhoneNumberField(widget=PhoneNumberPrefixWidget(initial='NG', attrs={'class': 'form-control'}), required=True)
+    registration_type = forms.ChoiceField(choices=[('manager', 'Manager'), ('renter', 'Renter')],
+                                          widget=forms.RadioSelect, label='Choose registration type: (Are you renting? Or Do you want to list properties for rental?)',)
     
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'phone_number', 'gender']
+        fields = ['first_name', 'last_name', 'username', 'email', 'phone_number', 'gender', 'registration_type']
+        
 
     # Explicitly mark all other fields as required
     # first_name = forms.CharField(required=True)
@@ -27,9 +30,12 @@ class UserForm(UserCreationForm):
         super().__init__(*args, **kwargs)
 
         # Mark all fields as required
-        for field_name, field in self.fields.items():
-            field.required = True
+        # for field_name, field in self.fields.items():
+        #     field.required = True
 
+        # Explicitly mark additional fields as required
+        for field_name in ['first_name', 'last_name', 'username', 'email', 'gender']:
+            self.fields[field_name].required = True
 
 
 class ManagerRegistrationForm(forms.ModelForm):
@@ -52,7 +58,7 @@ class PropertyForm(forms.ModelForm):
         widgets = {
             'features': forms.CheckboxSelectMultiple,
         }
-        # exclude = ['property_manager', 'created_at']
+
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

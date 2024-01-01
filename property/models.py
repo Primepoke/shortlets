@@ -36,17 +36,6 @@ class RenterProfile(models.Model):
         return f"{self.user.username}'s Renter Profile"
 
 
-# def validate_video_or_picture(value):
-#     if not value['video'] and not value['picture']:
-#         raise ValidationError('Please provide at least one of video or picture.')
-
-# def validate_video_or_picture(value):
-#     video = value.get('video')
-#     picture = value.get('picture')
-
-#     if not video and not picture:
-#         raise ValidationError('Please provide at least one of video or picture.')
-
 
 class Property(models.Model):
     title = models.CharField(max_length=255)
@@ -72,11 +61,9 @@ class Property(models.Model):
 
     # Additional fields as needed
 
-    # def __str__(self):
-    #     return self.title
+    def __str__(self):
+        return self.title
 
-    # def clean(self):
-    #     validate_video_or_picture({'video': self.video, 'picture': self.picture})
 
 
 class Feature(models.Model):

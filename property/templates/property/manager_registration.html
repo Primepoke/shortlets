@@ -1,0 +1,31 @@
+
+{% extends 'property/layout.html' %}
+
+{# Load the tag library #}
+{% load django_bootstrap5 %}
+
+<!-- {# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %} -->
+
+{% block title %}Register Manager Profile{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row justify-content-md-center">
+            <div class="col col-lg-2"></div>
+            <div class="col-md-auto">
+                <div>
+                    <form action="{% url 'manager_registration' %}" class="form" method="post">
+                    {% csrf_token %}
+                    {% bootstrap_form form %}
+                    {% bootstrap_button button_type="submit" content="Register" %}
+                    </form>
+                </div>
+           
+            </div>
+            
+            <div class="col col-lg-2"></div>
+        </div>
+    </div>
+{% endblock %}

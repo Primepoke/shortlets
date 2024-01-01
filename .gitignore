@@ -1,4 +1,9 @@
+# .gitignore
 
+*.pyc
+property/__pycache__/
 db.sqlite3
-media
+media/
 Project Details.txt
+property/migrations/
+shortlets/__pycache__/

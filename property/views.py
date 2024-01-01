@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, permission_required
 from .forms import ManagerRegistrationForm, RenterRegistrationForm, UserForm, PropertyForm
 
-from .models import ManagerProfile, Property
+from .models import ManagerProfile, Property, User
 # Create your views here.
 
 def index(request):
@@ -18,8 +18,20 @@ def register(request):
     if request.method == "POST":
         form = UserForm(request.POST)
         if form.is_valid():
-            user = form.save()
+            user = form.save(commit=False)
+            registration_type = request.POST.get('registration_type')
+
+            # Save user's details and log them in
+            user.save()
             login(request, user)
+
+            # Redirect the user based on selected profile
+            if registration_type == 'manager':
+                return redirect('manager_registration')
+            elif registration_type == 'renter':
+                return redirect('renter_registration')
+
+            # Redirect to index page if users don't specify a profile
             return redirect('index')
     else:
         form = UserForm()
@@ -59,34 +71,42 @@ def logout_view(request):
     return redirect('index')
 
 
+@login_required(login_url='login')
+def renter_registration(request):
+    user = request.user
 
-def renter_profile(request):
     if request.method == 'POST':
         form = RenterRegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save()
+            profile = form.save(commit=False)
+            profile.user = user
+            profile.save()
             login(request, user)
             return redirect('index') #Redirect to index page or home
     else:
         form = RenterRegistrationForm()
     
-    return render(request, 'property/renter_profile.html', {'form': form})
+    return render(request, 'property/renter_registration.html', {'form': form})
 
+@login_required(login_url='login')
+def manager_registration(request):
+    user = request.user
 
-def manager_profile(request):
     if request.method == 'POST':
         form = ManagerRegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save()
+            profile = form.save(commit=False)
+            profile.user = user
+            profile.save()
             login(request, user)
             return redirect('index') #Redirect to index/home page
     else:
         form = ManagerRegistrationForm()
     
-    return render(request, 'property/manager_profile.html', {'form': form})
+    return render(request, 'property/manager_registration.html', {'form': form})
 
 
-@login_required
+@login_required(login_url='login')
 def new_listing(request):
     if request.method == 'POST':
         form = PropertyForm(request.POST, request.FILES)

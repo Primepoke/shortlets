@@ -7,8 +7,8 @@ urlpatterns = [
     path('register', views.register, name='register'),
     path('login', views.login_view, name='login'),
     path('logout', views.logout_view, name='logout'),
-    path('profile/manager', views.manager_profile, name='manager_registration'),
-    path('profile/renter', views.renter_profile, name='renter_registration'),
+    path('profile/manager', views.manager_registration, name='manager_registration'),
+    path('profile/renter', views.renter_registration, name='renter_registration'),
     path('property/new_listing', views.new_listing, name='new_listing'),
     path('property/listing/<int:listing_id>', views.listing_details, name='listing_details'),
 ]
