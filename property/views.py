@@ -1,9 +1,10 @@
-from django.shortcuts import get_object_or_404, render, redirect
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required, permission_required
-from .forms import ManagerRegistrationForm, RenterRegistrationForm, UserForm, PropertyForm
+from django.contrib.auth.decorators import login_required, user_passes_test #,, permission_required,
+from django.shortcuts import get_object_or_404, render, redirect
+from .forms import ManagerRegistrationForm, RenterRegistrationForm, UserForm, PropertyForm, UserEditForm, ManagerProfileEditForm, RenterProfileEditForm
 
-from .models import ManagerProfile, Property, User
+from .models import ManagerProfile, Property, RenterProfile, User
 # Create your views here.
 
 def index(request):
@@ -71,9 +72,17 @@ def logout_view(request):
     return redirect('index')
 
 
+# RENTER VIEWS - REGISTRATION, EDIT, PROFILE PAGE, ETC
+
 @login_required(login_url='login')
 def renter_registration(request):
     user = request.user
+
+    # Check if the user already has a renter profile
+    if hasattr(user, 'renter'):
+        messages.warning(request, "You already have a renter profile.")
+        return redirect('index')  # Redirect to a suitable page
+
 
     if request.method == 'POST':
         form = RenterRegistrationForm(request.POST)
@@ -88,9 +97,32 @@ def renter_registration(request):
     
     return render(request, 'property/renter_registration.html', {'form': form})
 
+
+# def renter_profile(request, username):
+#     user = get_object_or_404(User, username=username)
+#     profile = get_object_or_404(RenterProfile, user=user)
+#     renter_reviews = profile.reviews.all()
+#     # renter_properties = [review.property for review in renter_reviews]
+    
+#     context = {
+#         'profile': profile,
+#         'renter_reviews': renter_reviews,
+#         # 'renter_properties': renter_properties
+#     }
+    
+#     return render(request, 'property/renter_profile.html', context)
+
+
+# MANAGER VIEWS - REGISTRATION, EDIT, PROFILE PAGE, ETC
+
 @login_required(login_url='login')
 def manager_registration(request):
     user = request.user
+
+    # Check if the user already has a manager profile
+    if hasattr(user, 'manager'):
+        messages.warning(request, "You already have a manager profile.")
+        return redirect('index')  # Redirect to a suitable page
 
     if request.method == 'POST':
         form = ManagerRegistrationForm(request.POST)
@@ -105,22 +137,116 @@ def manager_registration(request):
     
     return render(request, 'property/manager_registration.html', {'form': form})
 
+# def manager_profile(request, username):
+#     user = get_object_or_404(User, username=username)
+#     profile = get_object_or_404(ManagerProfile, user=user)
+#     properties = profile.properties_managed.prefetch_related('reviews__renter').all()
 
-@login_required(login_url='login')
+#     context = {
+#         'profile': profile,
+#         'properties': properties,
+#     }
+
+#     return render(request, 'property/manager_profile.html', context)
+
+
+# View to get all profiles for manager, renter, or user.
+def profile(request, username):
+    user = get_object_or_404(User, username=username)
+
+    if hasattr(user, 'manager'):
+        profile = get_object_or_404(ManagerProfile, user=user)
+        properties = profile.properties_managed.prefetch_related('reviews__renter').all()
+
+        context = {
+            'profile': profile,
+            'manager_properties': properties,
+            'template_name': 'property/manager_profile.html',
+        }
+
+    elif hasattr(user, 'renter'):
+        profile = get_object_or_404(RenterProfile, user=user)
+        renter_reviews = profile.reviews.all()
+        # renter_properties = [review.property for review in renter_reviews]
+
+        context = {
+            'profile': profile,
+            # 'renter_properties': renter_properties,
+            'renter_reviews': renter_reviews,
+            'template_name': 'property/renter_profile.html',
+        }
+
+    else:
+        # profile = get_object_or_404(User, user=user)
+
+        context = {
+            'profile': user,
+            'template_name': 'property/user_profile.html',
+        }
+
+    return render(request, context['template_name'], context)
+
+
+
+# EDIT PROFILE VIEW
+
+@login_required(login_url='login_view')
+def profile_edit(request):
+    user = request.user
+
+    # Check if the user has a manager profile
+    if hasattr(user, 'manager'):
+        profile = user.manager
+        profile_form = ManagerProfileEditForm(request.POST or None, instance=profile)
+    # Check if the user has a renter profile
+    elif hasattr(user, 'renter'):
+        profile = user.renter
+        profile_form = RenterProfileEditForm(request.POST or None, instance=profile)
+    # User has neither manager nor renter profile
+    else:
+        profile = None
+        profile_form = None
+
+    user_form = UserEditForm(request.POST or None, instance=user)
+
+    if request.method == 'POST':
+        if user_form.is_valid() and (not profile_form or profile_form.is_valid()):
+            user_form.save()
+            if profile_form:
+                profile_form.save()
+
+            return redirect('profile_detail')  # Redirect to the user's profile detail view
+
+    context = {
+        'user_form': user_form,
+        'profile_form': profile_form,
+    }
+
+    return render(request, 'property/profile_edit.html', context)
+
+
+# NEW LISTING VIEW
+
+def is_manager(user):
+    # Check if the user is both logged-in and a manager
+    return user.is_authenticated and hasattr(user, 'manager')
+
+@user_passes_test(is_manager, login_url='manager_registration')
 def new_listing(request):
     if request.method == 'POST':
         form = PropertyForm(request.POST, request.FILES)
         user = request.user
 
-        try:
-            property_manager = ManagerProfile.objects.get(user=user)
-        except ManagerProfile.DoesNotExist:
-            error_message = "You must register a property manager profile to create a listing."
-            return render(request, 'property/new_manager_profile.html', {'error_message': error_message})
-
+        # try:
+        #     property_manager = ManagerProfile.objects.get(user=user)
+        # except ManagerProfile.DoesNotExist:
+        #     # Add a message and redirect to manager registration
+        #     messages.warning(request, "You must be a manager to list a property.")
+        #     return redirect('manager_registration')
+        
         if form.is_valid():
             property = form.save(commit=False)
-            property.property_manager = property_manager
+            property.property_manager = ManagerProfile.objects.get(user=user)
             property.save()
             form.save_m2m()  # Save the many-to-many relationships after saving the instance
 

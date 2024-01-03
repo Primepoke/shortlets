@@ -51,7 +51,7 @@ class Property(models.Model):
     bathrooms = models.PositiveIntegerField()
     guests_capacity = models.PositiveIntegerField()
     features = models.ManyToManyField('Feature', related_name='properties', blank=True)
-    property_manager = models.ForeignKey(ManagerProfile, on_delete=models.CASCADE)
+    property_manager = models.ForeignKey(ManagerProfile, on_delete=models.CASCADE, related_name='properties')
     is_available = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -77,8 +77,8 @@ class Feature(models.Model):
 
 
 class Booking(models.Model):
-    property = models.ForeignKey(Property, on_delete=models.CASCADE)
-    renter = models.ForeignKey(RenterProfile, on_delete=models.CASCADE)
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='bookings')
+    renter = models.ForeignKey(RenterProfile, on_delete=models.CASCADE, related_name='bookings')
     check_in_date = models.DateField()
     check_out_date = models.DateField()
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -91,8 +91,8 @@ class Booking(models.Model):
 
 
 class Review(models.Model):
-    property = models.ForeignKey(Property, on_delete=models.CASCADE)
-    renter = models.ForeignKey(RenterProfile, on_delete=models.CASCADE)
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='reviews')
+    renter = models.ForeignKey(RenterProfile, on_delete=models.CASCADE, related_name='reviews')
     rating = models.PositiveIntegerField(choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')])
     comment = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)

@@ -16,7 +16,7 @@
             <div class="col col-lg-2"></div>
             <div class="col-md-auto">
                 <div>
-                    <form action="{% url 'renter_registration' %}" class="form" method="post">
+                    <form action="{% url 'renter_registration' %}" class="form" method="post" enctype="multipart/form-data">
                         {% csrf_token %}
                         {% bootstrap_form form %}
                         {% bootstrap_button button_type="submit" content="Update Profile" %}

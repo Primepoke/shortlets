@@ -55,6 +55,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # or another engine if preferred
+
 ROOT_URLCONF = 'shortlets.urls'
 
 TEMPLATES = [

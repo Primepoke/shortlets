@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.utils.translation import gettext_lazy as _
 
 from .models import ManagerProfile, RenterProfile, User, Property
@@ -12,7 +12,8 @@ from phonenumber_field.widgets import PhoneNumberPrefixWidget
 class UserForm(UserCreationForm):
     phone_number = PhoneNumberField(widget=PhoneNumberPrefixWidget(initial='NG', attrs={'class': 'form-control'}), required=True)
     registration_type = forms.ChoiceField(choices=[('manager', 'Manager'), ('renter', 'Renter')],
-                                          widget=forms.RadioSelect, label='Choose registration type: (Are you renting? Or Do you want to list properties for rental?)',)
+                                          widget=forms.RadioSelect, label='Choose registration type: (Are you renting? Or Do you want to list properties for rental?)',
+                                          required=False)
     
     class Meta:
         model = User
@@ -83,3 +84,26 @@ class PropertyForm(forms.ModelForm):
             raise forms.ValidationError('Please provide either a video or pictures of the apartment or both')
         
         return cleaned_data
+
+
+
+# FORMS FOR EDITING USER/PROFILE DETAILS
+
+class UserEditForm(UserChangeForm):
+    password = None #Removes the password field
+    
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email', 'phone_number', 'gender']
+
+
+class ManagerProfileEditForm(forms.ModelForm):
+    class Meta:
+        model = ManagerProfile
+        fields = ['company_name', 'contact_email', 'about', 'picture']
+
+
+class RenterProfileEditForm(forms.ModelForm):
+    class Meta:
+        model = RenterProfile
+        fields = ['occupation', 'emergency_contact_name', 'emergency_contact_phone', 'preferred_contact_method', 'picture']

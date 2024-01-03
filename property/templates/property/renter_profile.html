@@ -1,0 +1,50 @@
+
+{% extends 'property/layout.html' %}
+
+{# Load the tag library #}
+{% load django_bootstrap5 %}
+
+<!-- {# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %} -->
+
+{% block title %}{{ profile.user.username | title }}'s Profile{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row justify-content-md-center">
+            <div class="col col-lg-2"></div>
+            <div class="col-md-auto">
+                <div>
+                    <h1>{{ profile.user.username | title }}'s Profile</h1>
+
+                    <p>Name: {{ profile.user.first_name | title }} {{ profile.user.last_name | title }}</p>
+                    {% if profile.picture %}
+                        <p>picture: {{ profile.picture.url }}</p>
+                    {% endif %}
+                    
+                    <h2>Reviews Left</h2>
+                    {% if renter_reviews %}
+                        <ul>
+                            {% for review in renter_reviews %}
+                                <li>
+                                    Property: {{ review.property.title }}<br>
+                                    Rating: {{ review.rating }}<br>
+                                    Comment: {{ review.comment }}<br>
+                                    {% if review.manager_response %}
+                                        Manager Response: {{ review.manager_response }}<br>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No reviews found.</p>
+                    {% endif %}
+                </div>
+           
+            </div>
+            
+            <div class="col col-lg-2"></div>
+        </div>
+    </div>
+{% endblock %}
