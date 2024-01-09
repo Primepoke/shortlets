@@ -1,4 +1,4 @@
-{% extends 'property/layout.html' %}
+{% extends 'base.html' %}
 
 {# Load the tag library #}
 {% load django_bootstrap5 %}
@@ -62,7 +62,7 @@
                         <p>Other Features/Amenities Available: {% for feature in property.features.all %}
                         {{ feature.number }} {{ feature.name }},
                         {% endfor %}</p>
-                    
+                        <p><span><a href="{% url 'check_availability' property_id=property.id %}"><button>Check Availability.</button></a></span> <span><a href="{% url 'create_booking' property_id=property.id %}"><button>Book Now!</button></a></span></p>
                     </div>
             </div>
             <div class="col col-lg-2"></div>

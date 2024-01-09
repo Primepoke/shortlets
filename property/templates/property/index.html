@@ -1,4 +1,4 @@
-{% extends 'property/layout.html' %}
+{% extends 'base.html' %}
 
 
 {% block title %}Home{% endblock %}
@@ -53,7 +53,7 @@
                 <p>Living Spaces: {{ property.parlours }} parlours,
                    {{ property.bedrooms }} bedrooms &
                    {{ property.bathrooms }} bathrooms.</p>
-                   <p><a href="{% url 'listing_details' listing_id=property.id %}">Click for more details.</a></p>            
+                   <p><a href="{% url 'listing_details' listing_id=property.id %}">Click for more details. <span><a href="{% url 'check_availability' property_id=property.id %}"><button>Check Availability.</button></a></span> <span><a href="{% url 'create_booking' property_id=property.id %}"><button>Book Now!</button></a></span></p>            
             </div>
         {% endfor %}
 

@@ -7,7 +7,7 @@
 {% bootstrap_css %}
 {% bootstrap_javascript %} -->
 
-{% block title %}Register Manager Profile{% endblock %}
+{% block title %}Login Check{% endblock %}
 
 {% block content %}
     <div class="container">
@@ -15,10 +15,10 @@
             <div class="col col-lg-2"></div>
             <div class="col-md-auto">
                 <div>
-                    <form action="{% url 'manager_registration' %}" class="form" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {% bootstrap_form form %}
-                    {% bootstrap_button button_type="submit" content="Update Profile" %}
+                    <form action="{% url 'login_check' %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% bootstrap_form form %}
+                        {% bootstrap_button button_type="submit" content="Book Now" %}
                     </form>
                 </div>
            

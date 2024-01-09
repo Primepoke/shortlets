@@ -32,10 +32,11 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     # my apps
-    'phonenumber_field',
+    'booking',
     'property',
     # third-party apps
     'django_bootstrap5',
+    'phonenumber_field',
     # django apps
     'django.contrib.admin',
     'django.contrib.auth',
@@ -62,7 +63,7 @@ ROOT_URLCONF = 'shortlets.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

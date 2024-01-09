@@ -2,6 +2,8 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test #,, permission_required,
 from django.shortcuts import get_object_or_404, render, redirect
+from django.urls import reverse
+
 from .forms import ManagerRegistrationForm, RenterRegistrationForm, UserForm, PropertyForm, UserEditForm, ManagerProfileEditForm, RenterProfileEditForm
 
 from .models import ManagerProfile, Property, RenterProfile, User
@@ -20,7 +22,8 @@ def register(request):
         form = UserForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            registration_type = request.POST.get('registration_type')
+            registration_type = form.cleaned_data.get('registration_type')
+            # registration_type = request.POST.get('registration_type')
 
             # Save user's details and log them in
             user.save()
@@ -91,7 +94,20 @@ def renter_registration(request):
             profile.user = user
             profile.save()
             login(request, user)
-            return redirect('index') #Redirect to index page or home
+
+            messages.success(request, 'Renter profile created successfully!')
+            
+            # Check if there is a 'source' query parameter
+            source = request.GET.get('source', None)
+            if source == 'create_booking':
+                # If the source is 'create_booking', redirect back to create_booking
+                property_id = request.GET.get('property_id', None)
+                if property_id:
+                    redirect_url = reverse('create_booking', kwargs={'property_id': property_id})
+                    return redirect(redirect_url)
+            
+            # If no specific source, redirect to a default view or index page
+            return redirect('index')
     else:
         form = RenterRegistrationForm()
     

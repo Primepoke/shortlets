@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{# Load the tag library #}
+{% load django_bootstrap5 %}
+
+<!-- {# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %} -->
+
+{% block title %}Login Check{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row justify-content-md-center">
+            <div class="col col-lg-2"></div>
+            <div class="col-md-auto">
+                <div>
+                    <p>Booking Details for {{ request.user | title }}</p>
+                    <p>Property: {{ booking.property.title }}</p>
+                    <p>Check-in date: {{ booking.check_in_date }}</p>
+                    <p>Check-out date: {{ booking.check_out_date }}</p>
+                    <p>Duration of Stay: {{ number_of_days }} days</p>
+                    <p>Total Price: {{ booking.total_price }}</p>
+                    <form action="{% url 'confirm_booking' booking_id=booking.id %}" method="post">
+                        {% csrf_token %}
+                        <button>Confirm Booking</button>
+                    </form>
+                    
+                </div>
+            </div>
+            
+            <div class="col col-lg-2"></div>
+        </div>
+    </div>
+{% endblock %}
