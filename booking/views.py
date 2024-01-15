@@ -1,15 +1,15 @@
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import login #authenticate,
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 
 from .models import Booking
 from .forms import BookingForm, LoginCheckForm, AvailabilityForm
 from .utils import is_property_available
-from decimal import Decimal
+from datetime import date
 
-from property.models import Property #, RenterProfile
-from property.forms import RenterRegistrationForm #, UserForm
+from property.models import Property, RenterProfile
 
 # Create your views here.
 
@@ -22,10 +22,10 @@ def check_availability(request, property_id):
         form = AvailabilityForm(request.POST)
 
         if form.is_valid():
-            start_date = form.cleaned_data['start_date']
-            end_date = form.cleaned_data['end_date']
+            start_date = form.cleaned_data['start_date'].date() 
+            end_date = form.cleaned_data['end_date'].date() 
 
-            if start_date > end_date:
+            if start_date> end_date:
                 messages.warning(request, "Start date should be before end date.")
                 return redirect(reverse('check_availability', args=[property_id]))
 
@@ -45,7 +45,6 @@ def check_availability(request, property_id):
 def login_check(request):
     if request.method == 'POST':
         user = request.user
-        print(user)
         form = LoginCheckForm(request.POST)
 
         if form.is_valid():
@@ -89,8 +88,8 @@ def create_booking(request, property_id):
     if request.method == 'POST':
         form = BookingForm(request.POST)
         if form.is_valid():
-            start_date = form.cleaned_data['check_in_date']
-            end_date = form.cleaned_data['check_out_date']
+            start_date = form.cleaned_data['check_in_datetime']
+            end_date = form.cleaned_data['check_out_datetime']
 
             # Call the availability check function
             if is_property_available(property, start_date, end_date):
@@ -100,8 +99,8 @@ def create_booking(request, property_id):
 
                 # Store form data in the session
                 form_data = form.cleaned_data
-                form_data['check_in_date'] = form_data['check_in_date'].isoformat()
-                form_data['check_out_date'] = form_data['check_out_date'].isoformat()
+                form_data['check_in_datetime'] = form_data['check_in_datetime'].isoformat()
+                form_data['check_out_datetime'] = form_data['check_out_datetime'].isoformat()
                 request.session['booking_form_data'] = form_data
 
                 if user.is_authenticated:
@@ -109,6 +108,7 @@ def create_booking(request, property_id):
                     if hasattr(user, 'renter'):
                         booking.renter = user.renter
                         booking.get_total_price()
+                        booking.save_unconfirmed()
                         booking.save()
 
                         return redirect('confirm_booking', booking_id=booking.id)
@@ -124,8 +124,8 @@ def create_booking(request, property_id):
 
             else:
                 # Property is not available, handle accordingly
-                booked_start_date = property.bookings.check_in_date
-                booked_end_date = property.bookings.check_out_date
+                booked_start_date = property.bookings.check_in_datetime.date()
+                booked_end_date = property.bookings.check_out_datetime.date()
                 messages.warning(request, f"This property is Not Available from {booked_start_date.isoformat()} to {booked_end_date.isoformat()}. Please choose different dates.")
 
                 context = {'form': form, 'property': property}
@@ -144,38 +144,129 @@ def create_booking(request, property_id):
     return render(request, 'booking/create_booking.html', context)
 
 
-
+@login_required()
 def confirm_booking(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id)
-    number_of_days = booking.get_number_of_days()
-    booking.get_total_price()
-
+    number_of_days = booking.get_stay_duration()
+    
     if request.method == 'POST':
         # Implement payment logic here
 
         # Dummy code to use for testing the booking and confirmation process
         messages.success(request, "payment successful. Booking successful")
 
-        booking.is_confirmed = True
+        booking.save_confirmed()
         booking.save()
-        # print(booking)
+
         return redirect(reverse('listing_details', args=[booking.property.id]))
 
     context = {
         'booking': booking,
         'number_of_days': number_of_days,
     }
+    print(context['booking'].check_in_datetime)
     return render(request, 'booking/confirm_booking.html', context)
 
 
-
+login_required()
 def cancel_booking(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id)
 
     if request.method == 'POST':
-        # Implement cancellation logic here
-        booking.is_confirmed = False
-        booking.save()
-        return redirect('booking_cancellation_confirmation', booking_id=booking.id)
+        # If the booking hasn't been confirmed yet, just return to the listing view because the booking hasn't been saved
+        if booking.confirmation_status == 'unconfirmed':
+            return redirect('renter_booking_details')
+        
+        # If the booking is confirmed (meaning payment has also been made) but the stay duration has started running, don't cancel
+        elif booking.is_confirmed == True and (date.today() > booking.check_in_datetime.date() or date.today() > booking.check_out_datetime.date()):
+            messages.warning(request, "You cannot cancel this booking because your stay duration has started running or has expired!")
+            return redirect('renter_booking_details')
+        else:
+            # cancel booking
+            # Implement payment cancellation/refund logic here
+        
+            booking.confirmation_status = 'cancelled'
+            booking.save()
+
+            messages.success(request, "Booking successfully cancelled!")
+            return redirect('renter_booking_details')
 
     return render(request, 'cancel_booking.html', {'booking': booking})
+
+
+
+# VIEWS FOR VIEWING RENTER BOOKINGS
+
+def is_renter(user):
+    # Check if the user is both logged-in and a manager
+    return user.is_authenticated and hasattr(user, 'renter')
+
+@user_passes_test(is_renter)
+def renter_bookings_view(request):
+    user = request.user
+    renter_profile = get_object_or_404(RenterProfile, user=user)
+    bookings = Booking.objects.filter(renter=renter_profile).order_by('-check_in_datetime')
+
+    current_bookings = []
+    past_bookings = []
+    for booking in bookings:
+        if booking.confirmation_status == 'confirmed' or booking.confirmation_status == 'cancelled':
+            if date.today() < booking.check_out_datetime.date():
+                current_bookings.append(booking)
+            else:
+                past_bookings.append(booking)
+
+    context = {
+        'bookings': bookings,
+        'current_bookings': current_bookings,
+        'past_bookings': past_bookings
+        }
+
+    return render(request, 'booking/renter_bookings.html', context)
+
+
+@user_passes_test(is_renter)
+def renter_booking_details(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id)
+
+    return render(request, 'booking/renter_booking_details.html', {'booking': booking})
+
+
+
+# VIEWS FOR VIEWING MANAGER'S BOOKINGS
+
+def is_manager(user):
+    # Check if the user is both logged-in and a manager
+    return user.is_authenticated and hasattr(user, 'manager')
+
+@user_passes_test(is_manager)
+def manager_bookings_view(request):
+    user = request.user
+
+    properties = Property.objects.filter(user=user)
+    bookings = properties.bookings.all().order_by('-check_in_datetime')
+    
+    current_bookings = []
+    past_bookings = []
+    for booking in bookings:
+        if date.today() < booking.check_out_datetime.date():
+            current_bookings.append(booking)
+        else:
+            past_bookings.append(booking)
+
+    context = {
+        'properties': properties,
+        'bookings': bookings,
+        'current_bookings': current_bookings,
+        'past_bookings': past_bookings
+    }
+
+    return render(request, 'booking/manager_bookings.html', context)
+
+
+@user_passes_test(is_manager)
+def manager_booking_details(request, booking_id):
+    # user = request.user
+    booking = get_object_or_404(Booking, id=booking_id)
+
+    return render(request, 'booking/manager_booking_details.html', {'booking': booking})

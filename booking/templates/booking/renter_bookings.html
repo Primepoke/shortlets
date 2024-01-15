@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{# Load the tag library #}
+{% load django_bootstrap5 %}
+
+<!-- {# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %} -->
+
+{% block title %} Bookings for {{ request.user | title }}{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row justify-content-md-center">
+            <div class="col col-lg-2"></div>
+            <div class="col-md-auto">
+                <div>
+                    {% if bookings %}
+                        <h3>Current Bookings/Reservations</h3>
+                        {% if current_bookings %}
+                            {% for booking in current_bookings %}
+                                <p>Property title: {{ booking.property.title }}</p>
+                                <p>Check-in Date & Time: {{ booking.check_in_datetime }}</p>
+                                <p>Check-out Date & Time: {{ booking.check_out_datetime }}</p>
+                                <p>Total Price for Booking: {{ booking.total_price }}</p>
+                                {% if booking.confirmation_status == 'confirmed' %}
+                                    <p> Booking Status: {{ booking.confirmation_status | title }}</p>
+                                {% elif booking.confirmation_status == 'cancelled' %}
+                                    <p>Booking Status: {{ booking.confirmation_status | title }}</p>
+                                {% endif %}
+                                <a href="{% url 'renter_booking_details' booking_id=booking.id %}">View booking details here.</a>
+                                <br/>
+                            {% endfor %}
+                        {% else %}
+                            <p>No Current Bookings/Reservations</p>
+                        {% endif %}
+                        <br>
+                        <h3>Past Bookings/Reservations</h3>
+                        {% if past_bookings %}
+                            {% for booking in past_bookings %}
+                                <p>Property title: {{ booking.property.title }}</p>
+                                <p>Check-in Date & Time: {{ booking.check_in_datetime }}</p>
+                                <p>Check-out Date & Time: {{ booking.check_out_datetime }}</p>
+                                <p>Total Price for Booking: {{ booking.total_price }}</p>
+                                {% if booking.confirmation_status == 'confirmed' %}
+                                    <p>Booking Status: {{ booking.confirmation_status | title }}</p>
+                                {% elif booking.confirmation_status == 'cancelled' %}
+                                    <p>Booking Status: {{ booking.confirmation_status | title }}</p>
+                                {% endif %}
+                                <a href="{% url 'renter_booking_details' booking_id=booking.id %}">View booking details here.</a>
+                                <br/>
+                            {% endfor %}
+                        {% else %}
+                        <p>No Past Bookings/Reservations</p>
+                        {% endif %}
+                    {% else %}
+                        <p>You haven't made any bookings or reservations yet!</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col col-lg-2"></div>
+        </div>
+    </div>
+{% endblock %}
