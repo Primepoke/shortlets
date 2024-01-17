@@ -23,9 +23,9 @@
                     <p>Total Price: {{ booking.total_price }}</p>
                     <form action="{% url 'confirm_booking' booking_id=booking.id %}" method="post">
                         {% csrf_token %}
-                        <button>Confirm Booking</button>
+                        {% bootstrap_form form %}
+                        <button class="btn btn-primary btn-block mb-4">Confirm Booking</button>
                     </form>
-                    
                 </div>
             </div>
             

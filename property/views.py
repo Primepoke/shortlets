@@ -1,12 +1,13 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required, user_passes_test #,, permission_required,
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 
 from .forms import ManagerRegistrationForm, RenterRegistrationForm, UserForm, PropertyForm, UserEditForm, ManagerProfileEditForm, RenterProfileEditForm
 
 from .models import ManagerProfile, Property, RenterProfile, User
+from payments.models import UserWallet
 # Create your views here.
 
 def index(request):
@@ -146,6 +147,10 @@ def manager_registration(request):
             profile = form.save(commit=False)
             profile.user = user
             profile.save()
+
+            # Create a wallet for the manager profile
+            user_wallet, created = UserWallet.objects.get_or_create(manager_profile=profile, defaults={'currency': 'NGN'})
+
             login(request, user)
             return redirect('index') #Redirect to index/home page
     else:

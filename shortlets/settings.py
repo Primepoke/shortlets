@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     # my apps
     'booking',
     'property',
+    'payments',
     # third-party apps
     'django_bootstrap5',
     'phonenumber_field',
@@ -123,6 +124,10 @@ USE_TZ = True
 
 # Setting default Country to Nigeria for phone Numbers
 PHONENUMBER_DEFAULT_REGION = 'NG'
+
+# Paystack Keys Settings
+PAYSTACK_SECRET_KEY = ""
+PAYSTACK_PUBLIC_KEY = ""
 
 
 

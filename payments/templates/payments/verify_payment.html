@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{# Load the tag library #}
+{% load django_bootstrap5 %}
+
+<!-- {# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %} -->
+
+{% block title %}Login Check{% endblock %}
+
+{% block content %}
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <div class="container">
+        <div class="row justify-content-md-center">
+            <div class="col col-lg-2"></div>
+            <div class="col-md-auto">
+                <div>
+                    <h3>Confirm Payment for {{ booking.property.title }}</h3>
+                    <p>Booking Details for {{ request.user | title }}</p>
+                    <p>Property: {{ booking.property.title }}</p>
+                    <p>Check-in date: {{ booking.check_in_datetime }}</p>
+                    <p>Check-out date: {{ booking.check_out_datetime }}</p>
+                    <p>Duration of Stay: {{ number_of_days }} days</p>
+                    <p>Total Price: {{ booking.total_price }}</p>
+                    
+                    <button onclick="payWithPaystack()" class="btn btn-primary btn-block mb-4">Verify Payment</button>
+                </div>
+            </div>
+            
+            <div class="col col-lg-2"></div>
+        </div>
+    </div>
+
+    <script>
+        function payWithPaystack() {
+            let currency = "NGN";
+            let plan = "";
+            let ref = "{{ payment.ref }}";
+            console.log('Payment Reference:', ref);
+            let amount = "{{ payment.amount }}";
+            let obj = {
+                key: "{{ paystack_pub_key }}",
+                email: "{{ payment.email }}",
+                amount: "{{ amount_value }}",
+                ref: ref,
+                callback: function (response) {
+                    window.location.href = "{% url 'verify_payment' payment.ref %}";
+                    console.log('code executed')
+                },
+            };
+            if (Boolean(currency)) {
+                obj.currency = currency.toUpperCase();
+            }
+            if (Boolean(plan)) {
+                obj.plan - plan;
+            }
+
+            var handler = PaystackPop.setup(obj);
+            handler.openIframe();
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Check if 'payment' exists in the context before calling the function
+            if ("payment" in window && window.payment_data !== null) {
+                payWithPaystack();
+            }
+        });
+    </script>
+
+<!-- 
+        document.addEventListener('DOMContentLoaded', function () {
+            function payWithPaystack() {
+                let currency = "NGN";
+                let plan = "";
+                let ref = "{{ payment.ref }}";
+                console.log('Payment Reference:', ref);
+                let amount = "{{ payment.amount }}";
+                let obj = {
+                    key: "{{ paystack_pub_key }}",
+                    email: "{{ payment.email }}",
+                    amount: "{{ amount_value }}",
+                    ref: ref,
+                    callback: function (response) {
+                        window.location.href = "{% url 'verify_payment' payment.ref %}";
+                        console.log('code executed')
+                    },
+                };
+                if (Boolean(currency)) {
+                    obj.currency = currency.toUpperCase();
+                }
+                if (Boolean(plan)) {
+                    obj.plan - plan;
+                }
+        
+                var handler = PaystackPop.setup(obj);
+                handler.openIframe();
+            }
+    
+            // Check if 'payment' exists in the context before calling the function
+            if ("payment" in window && window.payment_data !== null) {
+                payWithPaystack();
+            }
+        });
+    </script> -->
+    
+
+{% endblock %}

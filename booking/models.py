@@ -12,8 +12,6 @@ class Booking(models.Model):
     check_out_datetime = models.DateTimeField()
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
     confirmation_status = models.CharField(max_length=20, choices=[('unconfirmed', 'Unconfirmed'), ('confirmed', 'Confirmed'), ('cancelled', 'Cancelled')], default='unconfirmed')
-    # is_confirmed = models.BooleanField(default=False)
-    # is_canceled = models.BooleanField(default=False)
 
     # Additional fields as needed
     # Calculate number of days

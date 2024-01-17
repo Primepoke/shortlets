@@ -8,3 +8,4 @@ Project Details.txt
 booking/migrations
 property/migrations/
 shortlets/__pycache__/
+payments/migrations

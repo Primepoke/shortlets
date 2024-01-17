@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth import login #authenticate,
+from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
@@ -10,6 +10,7 @@ from .utils import is_property_available
 from datetime import date
 
 from property.models import Property, RenterProfile
+from payments.forms import ConfirmBookingForm
 
 # Create your views here.
 
@@ -148,24 +149,25 @@ def create_booking(request, property_id):
 def confirm_booking(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id)
     number_of_days = booking.get_stay_duration()
-    
-    if request.method == 'POST':
-        # Implement payment logic here
+    form = ConfirmBookingForm(request.POST)
 
-        # Dummy code to use for testing the booking and confirmation process
-        messages.success(request, "payment successful. Booking successful")
+    if form.is_valid() and request.method == 'POST':
+        submitted_email = form.cleaned_data['email']
 
-        booking.save_confirmed()
-        booking.save()
+        # store submitted email and context objects in session
+        request.session['submitted_email'] = submitted_email
 
-        return redirect(reverse('listing_details', args=[booking.property.id]))
+        return redirect(reverse('initiate_payment', kwargs={'booking_id': booking.id}))
 
+    form = ConfirmBookingForm()
     context = {
-        'booking': booking,
-        'number_of_days': number_of_days,
-    }
-    print(context['booking'].check_in_datetime)
+            'booking': booking,
+            'form': form,
+            'number_of_days': number_of_days,
+        }
+
     return render(request, 'booking/confirm_booking.html', context)
+
 
 
 login_required()
@@ -270,3 +272,44 @@ def manager_booking_details(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id)
 
     return render(request, 'booking/manager_booking_details.html', {'booking': booking})
+
+
+
+
+
+
+
+
+# @login_required()
+# def confirm_booking(request, booking_id):
+#     booking = get_object_or_404(Booking, id=booking_id)
+#     number_of_days = booking.get_stay_duration()
+#     form = ConfirmBookingForm(request.POST)
+
+#     if form.is_valid() and request.method == 'POST':
+#         submitted_email = form.cleaned_data['email']
+
+#         # Implement payment logic here
+#         context = initiate_payment_helper(request, booking, submitted_email)
+
+#         # store submitted email and context objects in session
+#         request.session['submitted_email'] = submitted_email
+#         request.session['payment_data'] = context
+
+#         # # Dummy code to use for testing the booking and confirmation process
+#         # messages.success(request, "payment successful. Booking successful")
+
+#         # booking.save_confirmed()
+#         # booking.save()
+
+#         return redirect(reverse('listing_details', args=[booking.property.id]))
+
+#     form = ConfirmBookingForm()
+#     context = {
+#         'booking': booking,
+#         'form': form,
+#         'number_of_days': number_of_days,
+#         'payment_data': context,
+#     }
+
+#     return render(request, 'booking/confirm_booking.html', context)
