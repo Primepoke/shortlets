@@ -30,11 +30,13 @@ def check_availability(request, property_id):
                 messages.warning(request, "Start date should be before end date.")
                 return redirect(reverse('check_availability', args=[property_id]))
 
-            if is_property_available(property, start_date, end_date):
-                messages.success(request, f"This property is Available for Booking from {start_date.isoformat()} to {end_date.isoformat()}. BOOK NOW!")
+            status, message = is_property_available(property, start_date, end_date)
+
+            if status:
+                messages.success(request, message)
                 return redirect(reverse('listing_details', args=[property_id]))
             else:
-                messages.warning(request, f"This property is not available from {start_date.isoformat()} to {end_date.isoformat()}.")
+                messages.success(request, message)
                 return redirect(reverse('listing_details', args=[property_id]))
     else:
         form = AvailabilityForm()
@@ -89,11 +91,13 @@ def create_booking(request, property_id):
     if request.method == 'POST':
         form = BookingForm(request.POST)
         if form.is_valid():
-            start_date = form.cleaned_data['check_in_datetime']
-            end_date = form.cleaned_data['check_out_datetime']
+            start_date = form.cleaned_data['check_in_datetime'].date()
+            end_date = form.cleaned_data['check_out_datetime'].date()
 
             # Call the availability check function
-            if is_property_available(property, start_date, end_date):
+            status, message = is_property_available(property, start_date, end_date)
+
+            if status:
                 # Property is available, continue with booking process
                 booking = form.save(commit=False)
                 booking.property = property
@@ -125,9 +129,7 @@ def create_booking(request, property_id):
 
             else:
                 # Property is not available, handle accordingly
-                booked_start_date = property.bookings.check_in_datetime.date()
-                booked_end_date = property.bookings.check_out_datetime.date()
-                messages.warning(request, f"This property is Not Available from {booked_start_date.isoformat()} to {booked_end_date.isoformat()}. Please choose different dates.")
+                messages.warning(request, message)
 
                 context = {'form': form, 'property': property}
                 return render(request, 'booking/create_booking.html', context)
@@ -180,7 +182,7 @@ def cancel_booking(request, booking_id):
             return redirect('renter_booking_details')
         
         # If the booking is confirmed (meaning payment has also been made) but the stay duration has started running, don't cancel
-        elif booking.is_confirmed == True and (date.today() > booking.check_in_datetime.date() or date.today() > booking.check_out_datetime.date()):
+        elif booking.confirmation_status == 'confirmed' and (date.today() > booking.check_in_datetime.date() or date.today() > booking.check_out_datetime.date()):
             messages.warning(request, "You cannot cancel this booking because your stay duration has started running or has expired!")
             return redirect('renter_booking_details')
         else:
