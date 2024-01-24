@@ -5,10 +5,9 @@ from django.conf import settings
 from django.urls import reverse
 
 from booking.models import Booking
-from property.models import ManagerProfile
+from accounts.models import ManagerProfile
 
 # Create your views here.
-
 
 def initiate_payment(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id)
@@ -65,13 +64,16 @@ def verify_payment(request, ref):
 
         user = booking.property.property_manager.user
         manager = get_object_or_404(ManagerProfile, user=user)
-        print(user, manager)
         user_wallet, created = UserWallet.objects.get_or_create(manager_profile=manager)
         user_wallet.balance += payment.amount
         user_wallet.save()
+        
+        booking_id = booking.id
+        booking_url = reverse('renter_booking_details', args=[booking_id])
+        message = f"Congratulations! Booking and payment successful! <a href='{booking_url}'>Click here to view booking details</a>"
 
-        messages.success(request, "Booking and payment successful!")
+        messages.success(request, message)
         return redirect(reverse('listing_details', args=[booking.property.id]))
     else:
-        messages.error(request, "Payment verification failed. Please contact support.")
+        messages.error(request, "Payment verification failed. Please contact your bank or support.")
         return render(request, 'payment/verify_failed.html')

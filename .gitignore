@@ -1,11 +1,20 @@
 # .gitignore
 
 *.pyc
-property/__pycache__/
+property/__pycache__
 db.sqlite3
 media/
 Project Details.txt
 booking/migrations
-property/migrations/
-shortlets/__pycache__/
+booking/__pycache__
+property/migrations
+shortlets/__pycache__
 payments/migrations
+payments/__pycache__
+accounts/migrations
+accounts/__pycache__
+reports/migrations
+reports/__pycache__
+reviews/migrations
+reviews/__pycache__
+reports

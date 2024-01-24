@@ -7,23 +7,26 @@
 {% bootstrap_css %}
 {% bootstrap_javascript %} -->
 
-{% block title %}Register Renter Profile{% endblock %}
+{% block title %}Register{% endblock %}
 
-{% block content %}
+{% block main %}
     <div class="container">
         <div class="row justify-content-md-center">
             <div class="col col-lg-2"></div>
             <div class="col-md-auto">
+                <div><p>Have an account? <a href="{% url 'login' %}">Login here instead.</a></p></div>
                 <div>
-                    <form action="{% url 'renter_registration' %}" class="form" method="post" enctype="multipart/form-data">
+                    <form action="{% url 'register' %}" class="form" method="post">
                         {% csrf_token %}
+                        <!-- {{ form.as_p }} -->
                         {% bootstrap_form form %}
-                        {% bootstrap_button button_type="submit" content="Update Profile" %}
+                        {% bootstrap_button button_type="submit" content="Register" %}
                     </form>
                 </div>
         
-                <!-- <div><p>Have an account? <a href="{% url 'login' %}">Login here instead.</a></p></div> -->
+                <div><p>Have an account? <a href="{% url 'login' %}">Login here instead.</a></p></div>
                 
+                <!-- Type in your profile code choices here -->
             </div>
             
             <div class="col col-lg-2"></div>

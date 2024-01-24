@@ -9,7 +9,8 @@ from .forms import BookingForm, LoginCheckForm, AvailabilityForm
 from .utils import is_property_available
 from datetime import date
 
-from property.models import Property, RenterProfile
+from accounts.models import RenterProfile
+from property.models import Property
 from payments.forms import ConfirmBookingForm
 
 # Create your views here.
@@ -179,6 +180,7 @@ def cancel_booking(request, booking_id):
     if request.method == 'POST':
         # If the booking hasn't been confirmed yet, just return to the listing view because the booking hasn't been saved
         if booking.confirmation_status == 'unconfirmed':
+            messages.warning("You did not complete this booking. So there's no need cancelling.")
             return redirect('renter_booking_details')
         
         # If the booking is confirmed (meaning payment has also been made) but the stay duration has started running, don't cancel
@@ -274,44 +276,3 @@ def manager_booking_details(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id)
 
     return render(request, 'booking/manager_booking_details.html', {'booking': booking})
-
-
-
-
-
-
-
-
-# @login_required()
-# def confirm_booking(request, booking_id):
-#     booking = get_object_or_404(Booking, id=booking_id)
-#     number_of_days = booking.get_stay_duration()
-#     form = ConfirmBookingForm(request.POST)
-
-#     if form.is_valid() and request.method == 'POST':
-#         submitted_email = form.cleaned_data['email']
-
-#         # Implement payment logic here
-#         context = initiate_payment_helper(request, booking, submitted_email)
-
-#         # store submitted email and context objects in session
-#         request.session['submitted_email'] = submitted_email
-#         request.session['payment_data'] = context
-
-#         # # Dummy code to use for testing the booking and confirmation process
-#         # messages.success(request, "payment successful. Booking successful")
-
-#         # booking.save_confirmed()
-#         # booking.save()
-
-#         return redirect(reverse('listing_details', args=[booking.property.id]))
-
-#     form = ConfirmBookingForm()
-#     context = {
-#         'booking': booking,
-#         'form': form,
-#         'number_of_days': number_of_days,
-#         'payment_data': context,
-#     }
-
-#     return render(request, 'booking/confirm_booking.html', context)

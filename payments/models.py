@@ -3,7 +3,7 @@ from django.utils import timezone
 import secrets
 from .paystack import Paystack
 
-from property.models import ManagerProfile
+from accounts.models import ManagerProfile
 from booking.models import Booking
 
 # Create your models here.

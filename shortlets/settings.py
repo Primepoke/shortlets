@@ -28,15 +28,23 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+# Custom User
+AUTH_USER_MODEL = 'accounts.User'
+
+
 # Application definition
 
 INSTALLED_APPS = [
     # my apps
+    'accounts',
     'booking',
     'property',
     'payments',
+    # 'reports',
+    'reviews',
     # third-party apps
     'django_bootstrap5',
+    'django.contrib.humanize',
     'phonenumber_field',
     # django apps
     'django.contrib.admin',
@@ -145,5 +153,3 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Custom User
-AUTH_USER_MODEL = 'property.User'

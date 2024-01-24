@@ -1,3 +1,5 @@
+{% load tz %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,17 +18,28 @@
         <!-- Common header content goes here -->
     </header>
 
-
-    {% if messages %}
-        <ul class="messages">
-            {% for message in messages %}
-                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-
     <main>
-        {% block content %}{% endblock %} 
+        <div class="container">
+            {% block content %}
+
+                {% if user.is_authenticated %}
+                    Welcome {{ request.user | title }}!
+                {% endif %}
+
+                {% block messages %}
+                    {% if messages %}
+                        <ul class="messages">
+                            {% for message in messages %}
+                                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message | safe }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endblock %}
+                
+                {% block main %}{% endblock %}
+            
+            {% endblock %}
+        </div> 
     </main>
 
 

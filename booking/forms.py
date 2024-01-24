@@ -6,10 +6,11 @@ from .models import Booking
 class BookingForm(forms.ModelForm):
     check_in_datetime = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}))
     check_out_datetime = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}))
+    purpose_of_stay = forms.CharField(widget=forms.TextInput(attrs={'placeholder':'business, leisure, tourism etc'}))
 
     class Meta:
         model = Booking
-        fields = ['check_in_datetime', 'check_out_datetime']
+        fields = ['purpose_of_stay', 'check_in_datetime', 'check_out_datetime']
 
     # def __init__(self, *args, **kwargs):
     #     super(BookingForm, self).__init__(*args, **kwargs)

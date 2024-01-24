@@ -23,9 +23,12 @@ from django.urls import include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('property.urls')),
+    path('accounts/', include('accounts.urls')),
     path('', include('booking.urls')),
-    path('payments/', include("payments.urls"))
+    path('payments/', include('payments.urls')),
+    path('', include('property.urls')),
+    path('reports/', include('reports.urls')),
+    path('reviews/', include('reviews.urls')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,

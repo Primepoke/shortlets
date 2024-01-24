@@ -3,18 +3,18 @@
 
 {% block title %}Home{% endblock %}
 
-{% block content %}
+{% block main %}
 
-    {% if properties %}
+        {% if properties %}
         {%  for property in properties %}
             <div>
                 <p>Title: {{ property.title }}</p>
-                <p>{% if property.picture and property.video %}
+                <p>{% if property.image and property.video %}
 
                     <div id="carouselExample" class="carousel slide">
                         <div class="carousel-inner">
                             <div class="carousel-item active">
-                                <img src="{{ property.picture.url }}" alt="{{ property.title }}" class="d-block w-100" >
+                                <img src="{{ property.image.url }}" alt="{{ property.title }}" class="d-block w-90" >
                             </div>
                             <div class="carousel-item">
                                 <!-- <img src="..." class="d-block w-100" alt="..."> -->
@@ -35,8 +35,8 @@
                         </button>
                     </div>
                 
-                {% elif property.picture %}
-                    <img src="{{ property.picture.url }}" alt="{{ property.title }}">
+                {% elif property.image %}
+                    <img src="{{ property.image.url }}" alt="{{ property.title }}">
                 {% elif property.video %}
                     <video width="320" height="240" controls>
                         <source src="{{ property.video.url }}" type="video/mp4">

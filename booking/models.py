@@ -1,6 +1,7 @@
 from django.db import models
 
-from property.models import Property, RenterProfile
+from accounts.models import RenterProfile
+from property.models import Property
 # Create your models here.
 
 
@@ -8,11 +9,13 @@ from property.models import Property, RenterProfile
 class Booking(models.Model):
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='bookings')
     renter = models.ForeignKey(RenterProfile, on_delete=models.CASCADE, related_name='bookings')
+    purpose_of_stay = models.CharField(max_length=200, default='leisure') #(business, leisure, tourism etc)
     check_in_datetime = models.DateTimeField()
     check_out_datetime = models.DateTimeField()
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
     confirmation_status = models.CharField(max_length=20, choices=[('unconfirmed', 'Unconfirmed'), ('confirmed', 'Confirmed'), ('cancelled', 'Cancelled')], default='unconfirmed')
-
+    
+    
     # Additional fields as needed
     # Calculate number of days
     def get_stay_duration(self):

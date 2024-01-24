@@ -1,40 +1,8 @@
 from django.db import models
 
-from django.contrib.auth.models import AbstractUser
-# from django.core.exceptions import ValidationError
-from phonenumber_field.modelfields import PhoneNumberField
+from accounts.models import ManagerProfile
 
-# Create your models here.
-
-
-class User(AbstractUser):
-    phone_number = PhoneNumberField(help_text="Enter your phone number")
-    gender = models.CharField(max_length=20, choices=[('male', 'Male'), ('female', 'Female')], default='male', help_text="Select your gender")
-
-
-class ManagerProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="manager")
-    company_name = models.CharField(max_length=255, blank=True, null=True)
-    contact_email = models.EmailField(help_text="Contact email address")
-    about = models.TextField(blank=True, null=True, help_text="About the property manager")
-    properties_managed = models.ManyToManyField('Property', related_name='managers', blank=True)
-    picture = models.ImageField(upload_to='managers_pictures/', blank=True, null=True)
-
-    def __str__(self):
-        return f"{self.user.username}'s Manager Profile"
-
-
-class RenterProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='renter')
-    occupation = models.CharField(max_length=255, help_text="Occupation")
-    emergency_contact_name = models.CharField(max_length=255, blank=True, null=True, help_text="Emergency contact name")
-    emergency_contact_phone = PhoneNumberField(blank=True, null=True, help_text="Emergency contact phone number")
-    preferred_contact_method = models.CharField(max_length=20, choices=[('phone', 'Phone'), ('email', 'Email')], default='phone', help_text="Preferred contact method")
-    picture = models.ImageField(upload_to='renters_pictures/', blank=True, null=True)
-    
-    def __str__(self):
-        return f"{self.user.username}'s Renter Profile"
-
+# create your models here
 
 
 class Property(models.Model):
@@ -57,7 +25,12 @@ class Property(models.Model):
 
     # Updated fields for optional video and picture
     video = models.FileField(upload_to='property_videos/', blank=True, null=True)
-    picture = models.ImageField(upload_to='property_pictures/', blank=True, null=True)
+    video2 = models.FileField(upload_to='property_videos/', blank=True, null=True)
+    image = models.ImageField(upload_to='property_pictures/', blank=True, null=True)
+    image2 = models.ImageField(upload_to='property_pictures/', blank=True, null=True)
+    image3 = models.ImageField(upload_to='property_pictures/', blank=True, null=True)
+    image4 = models.ImageField(upload_to='property_pictures/', blank=True, null=True)
+    image5 = models.ImageField(upload_to='property_pictures/', blank=True, null=True)
 
     # Additional fields as needed
 
@@ -74,26 +47,4 @@ class Feature(models.Model):
 
     def __str__(self):
         return self.name
-
-
-class Review(models.Model):
-    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='reviews')
-    renter = models.ForeignKey(RenterProfile, on_delete=models.CASCADE, related_name='reviews')
-    rating = models.PositiveIntegerField(choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')])
-    comment = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    # Manager's response to the review
-    manager_response = models.TextField(blank=True, null=True)
-    manager_response_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
-
-    # Additional fields as needed
-
-    def __str__(self):
-        return f"{self.renter.username}'s Review for {self.property.title}"
-
-
-
-
-
 

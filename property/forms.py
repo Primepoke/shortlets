@@ -1,61 +1,14 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.utils.translation import gettext_lazy as _
 
-from .models import ManagerProfile, RenterProfile, User, Property
+from .models import Property
 
-
-from phonenumber_field.formfields import PhoneNumberField
-from phonenumber_field.widgets import PhoneNumberPrefixWidget
-
-class UserForm(UserCreationForm):
-    phone_number = PhoneNumberField(widget=PhoneNumberPrefixWidget(initial='NG', attrs={'class': 'form-control'}), required=True)
-    registration_type = forms.ChoiceField(choices=[('manager', 'Manager'), ('renter', 'Renter')],
-                                          widget=forms.RadioSelect, label='Choose registration type: (Are you renting? Or Do you want to list properties for rental?)',
-                                          required=False)
-    
-    class Meta:
-        model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'phone_number', 'gender', 'registration_type']
-        
-
-    # Explicitly mark all other fields as required
-    # first_name = forms.CharField(required=True)
-    # last_name = forms.CharField(required=True)
-    # username = forms.CharField(required=True)
-    # email = forms.EmailField(required=True)
-    # gender = forms.CharField(required=True)
-        
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # Mark all fields as required
-        # for field_name, field in self.fields.items():
-        #     field.required = True
-
-        # Explicitly mark additional fields as required
-        for field_name in ['first_name', 'last_name', 'username', 'email', 'gender']:
-            self.fields[field_name].required = True
-
-
-class ManagerRegistrationForm(forms.ModelForm):
-
-    class Meta:
-        model = ManagerProfile
-        fields = ['company_name', 'contact_email', 'picture']
-
-
-class RenterRegistrationForm(forms.ModelForm):
-
-    class Meta:
-        model = RenterProfile
-        fields = ['emergency_contact_name', 'emergency_contact_phone', 'preferred_contact_method', 'picture']
 
 class PropertyForm(forms.ModelForm):
     class Meta:
         model = Property
-        fields = ['title', 'video', 'picture', 'description', 'address', 'city', 'state', 'zip_code', 'country', 'price_per_night', 'parlours', 'bedrooms', 'bathrooms', 'guests_capacity', 'features', 'is_available']
+        fields = ['title', 'video', 'video2', 'image', 'image2', 'image3', 'image4', 'image5', 'description', 'address', 'city', 'state', 'zip_code', 'country', 'price_per_night', 'parlours', 'bedrooms', 'bathrooms', 'guests_capacity', 'features', 'is_available']
         widgets = {
             'features': forms.CheckboxSelectMultiple,
         }
@@ -64,7 +17,12 @@ class PropertyForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['video'].required = False
-        self.fields['picture'].required = False
+        self.fields['video2'].required = False
+        self.fields['image'].required = False
+        self.fields['image2'].required = False
+        self.fields['image3'].required = False
+        self.fields['image4'].required = False
+        self.fields['image5'].required = False
 
     def clean_video(self):
         video = self.cleaned_data.get('video')
@@ -75,35 +33,28 @@ class PropertyForm(forms.ModelForm):
                 raise ValidationError(_('Invalid file type. Please upload a valid video file.'))
         return video
 
+    def clean_video2(self):
+        video2 = self.cleaned_data.get('video2')
+        if video2:
+            allowed_extensions = ['mp4', 'avi', 'mkv', 'mov', 'wmv']  # Add more if needed
+            file_extension = video2.name.split('.')[-1].lower()
+            if file_extension not in allowed_extensions:
+                raise ValidationError(_('Invalid file type. Please upload a valid video file.'))
+        return video2
+
     def clean(self):
         cleaned_data = super().clean()
         video = cleaned_data.get('video')
-        picture = cleaned_data.get('picture')
+        video2 = cleaned_data.get('video2')
+        image = cleaned_data.get('image')
+        image2 = cleaned_data.get('image2')
+        image3 = cleaned_data.get('image3')
+        image4 = cleaned_data.get('image4')
+        image5 = cleaned_data.get('image5')
 
-        if not video and not picture:
+        if not video and not video2 and not image and not image2 and not image3 and not image4 and not image5:
             raise forms.ValidationError('Please provide either a video or pictures of the apartment or both')
         
         return cleaned_data
 
 
-
-# FORMS FOR EDITING USER/PROFILE DETAILS
-
-class UserEditForm(UserChangeForm):
-    password = None #Removes the password field
-    
-    class Meta:
-        model = User
-        fields = ['first_name', 'last_name', 'email', 'phone_number', 'gender']
-
-
-class ManagerProfileEditForm(forms.ModelForm):
-    class Meta:
-        model = ManagerProfile
-        fields = ['company_name', 'contact_email', 'about', 'picture']
-
-
-class RenterProfileEditForm(forms.ModelForm):
-    class Meta:
-        model = RenterProfile
-        fields = ['occupation', 'emergency_contact_name', 'emergency_contact_phone', 'preferred_contact_method', 'picture']

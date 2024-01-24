@@ -6,23 +6,133 @@
 
 {% block title %}New Listing{% endblock %}
 
-{% block content %}
+{% block main %}
     <div class="container">
         <div class="row justify-content-md-center">
             <div class="col col-lg-2"></div>
             <div class="col-md-auto">    
                     <div>
                         <p>Title: {{ property.title }}</p>
-                        <p>{% if property.picture and property.video %}
+
+                        <!-- Main Image or Video Section -->
+                        <div id="mainCarousel" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                {% if property.image %}
+                                    <div class="carousel-item active">
+                                        <img src="{{ property.image.url }}" alt="{{ property.title }}" class="d-block w-90">
+                                    </div>
+                                {% elif property.video %}
+                                    <div class="carousel-item active">
+                                        <video controls>
+                                            <source src="{{ property.video.url }}" type="video/mp4">
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Thumbnails Section -->
+                        <div id="thumbnailCarousel" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                {% if property.image2 %}
+                                    <div class="carousel-item">
+                                        <img src="{{ property.image2.url }}" alt="{{ property.title }} - Image 2" class="d-block w-100">
+                                    </div>
+                                {% endif %}
+                                {% if property.image3 %}
+                                    <div class="carousel-item">
+                                        <img src="{{ property.image3.url }}" alt="{{ property.title }} - Image 3" class="d-block w-100">
+                                    </div>
+                                {% endif %}
+                                {% if property.image4 %}
+                                    <div class="carousel-item">
+                                        <img src="{{ property.image4.url }}" alt="{{ property.title }} - Image 2" class="d-block w-100">
+                                    </div>
+                                {% endif %}
+                                {% if property.image5 %}
+                                    <div class="carousel-item">
+                                        <img src="{{ property.image5.url }}" alt="{{ property.title }} - Image 3" class="d-block w-100">
+                                    </div>
+                                {% endif %}
+                                <!-- Repeat the pattern for image4, image5, video2, video3, etc. -->
+
+                                <!-- Navigation Buttons -->
+                                <button class="carousel-control-prev" type="button" data-bs-target="#thumbnailCarousel" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#thumbnailCarousel" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                        </div>
+
+
+
+
+                        <p>Description/About: {{ property.description }}</p>
+                        <p>Address: {{ property.address }}
+                        {{ property.city }}
+                        {{ property.state }}
+                        {{ property.zip_code }}
+                        {{ property.country }}</p>
+                        <p>Price/Night: {{ property.price_per_night }} per night</p>
+                        <p>Living Spaces: {{ property.parlours }} parlours,
+                        {{ property.bedrooms }} bedrooms &
+                        {{ property.bathrooms }} bathrooms.</p>
+                        <p>Maximum Number of Guests allowed: {{ property.guests_capacity }} guests</p>
+                            <!-- {{ property.features.all }} -->
+                        <p>Other Features/Amenities Available: {% for feature in property.features.all %}
+                        {{ feature.number }} {{ feature.name }},
+                        {% endfor %}</p>
+                        <p><span><a href="{% url 'check_availability' property_id=property.id %}"><button>Check Availability.</button></a></span> <span><a href="{% url 'create_booking' property_id=property.id %}"><button>Book Now!</button></a></span> </p>
+                        
+                        
+                        <h3>Reviews</h3>
+                        <span><a href="{% url 'create_review' property_id=property.id %}"><button>Leave a review</button></a></span>
+                        {% if reviews %}
+                            {% for review in reviews %}
+                            <p>Review by {{ review.renter | title }}</p>
+                            <p>{{ review.title | title }}</p>
+                            <p>{{ review.rating | title }} stars</p>
+                            <p>{{ review.comment | title }}</p>
+                            {% if review.manager_response %}
+                                {% if review.manager_response.is_manager_response_visible == True %}
+                                    <p>Response from {{ review.property.property_manager.user }}, the property's manager </p>
+                                    {{ review.manager_response.response }}
+                                {% endif %}
+                            {% else %}
+                                <p><a href="{% url 'respond_to_review' review_id=review.id %}">Respond to this review</a> (property manager only!)</p>
+
+                            {% endif %}
+                            {% endfor %}
+                        {% else %}
+                        <p> There aren't any reviews for this property yet.</p>
+                        {% endif %}
+
+
+                    </div>
+            </div>
+            <div class="col col-lg-2"></div>
+        </div>        
+    </div>
+
+{% endblock %}
+
+
+
+                        <!-- <p>{% if property.image and property.video %}
         
                             <div id="carouselExample" class="carousel slide">
                                 <div class="carousel-inner">
                                     <div class="carousel-item active">
-                                        <img src="{{ property.picture.url }}" alt="{{ property.title }}" class="d-block w-100" >
+                                        <img src="{{ property.image.url }}" alt="{{ property.title }}" class="d-block w-100" >
                                     </div>
                                     <div class="carousel-item">
-                                        <!-- <img src="..." class="d-block w-100" alt="..."> -->
-                                        <!-- <video width="320" height="240" controls> -->
+                                        <img src="..." class="d-block w-100" alt="..."> 
+                                         <video width="320" height="240" controls>
                                         <video controls>
                                             <source src="{{ property.video.url }}" type="video/mp4">
                                             Your browser does not support the video tag.
@@ -40,33 +150,10 @@
                             </div>
                         
                         {% elif property.picture %}
-                            <img src="{{ property.picture.url }}" alt="{{ property.title }}">
+                            <img src="{{ property.image.url }}" alt="{{ property.title }}">
                         {% elif property.video %}
                             <video width="320" height="240" controls>
                                 <source src="{{ property.video.url }}" type="video/mp4">
                                 Your browser does not support the video tag.
                             </video>
-                        {% endif %}</p>
-                        <p>Description/About: {{ property.description }}</p>
-                        <p>Address: {{ property.address }}
-                        {{ property.city }}
-                        {{ property.state }}
-                        {{ property.zip_code }}
-                        {{ property.country }}</p>
-                        <p>Price/Night: {{ property.price_per_night }} per night</p>
-                        <p>Living Spaces: {{ property.parlours }} parlours,
-                        {{ property.bedrooms }} bedrooms &
-                        {{ property.bathrooms }} bathrooms.</p>
-                        <p>Maximum Number of Guests allowed: {{ property.guests_capacity }} guests</p>
-                            <!-- {{ property.features.all }} -->
-                        <p>Other Features/Amenities Available: {% for feature in property.features.all %}
-                        {{ feature.number }} {{ feature.name }},
-                        {% endfor %}</p>
-                        <p><span><a href="{% url 'check_availability' property_id=property.id %}"><button>Check Availability.</button></a></span> <span><a href="{% url 'create_booking' property_id=property.id %}"><button>Book Now!</button></a></span></p>
-                    </div>
-            </div>
-            <div class="col col-lg-2"></div>
-        </div>        
-    </div>
-
-{% endblock %}
+                        {% endif %}</p> -->
