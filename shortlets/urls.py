@@ -29,6 +29,7 @@ urlpatterns = [
     path('', include('property.urls')),
     path('reports/', include('reports.urls')),
     path('reviews/', include('reviews.urls')),
+    path('', include('search.urls')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,

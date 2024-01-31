@@ -19,6 +19,7 @@ class Property(models.Model):
     bathrooms = models.PositiveIntegerField()
     guests_capacity = models.PositiveIntegerField()
     features = models.ManyToManyField('Feature', related_name='properties', blank=True)
+    property_type = models.ForeignKey('PropertyType', related_name='properties', on_delete=models.CASCADE)
     property_manager = models.ForeignKey(ManagerProfile, on_delete=models.CASCADE, related_name='properties')
     is_available = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -48,3 +49,9 @@ class Feature(models.Model):
     def __str__(self):
         return self.name
 
+
+class PropertyType(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name

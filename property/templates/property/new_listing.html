@@ -10,12 +10,19 @@
     <div class="container">
         <div class="row justify-content-md-center">
             <div class="col col-lg-2"></div>
-            <div class="col-md-auto">    
-                <form action="{% url 'new_listing' %}" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {% bootstrap_form form %}
-                    {% bootstrap_button button_type="submit" content="Create Listing" %}
-                </form> 
+            <div class="col-md-auto">  
+                
+                <div class="card border-success " style="width: 50rem;">
+                    <div class="card-body">
+                        <form action="{% url 'new_listing' %}" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {% bootstrap_form form %}
+                            {% bootstrap_button button_type="submit" content="Create Listing" %}
+                        </form> 
+                    </div>
+                </div>
+
+                
             </div>
             <div class="col col-lg-2"></div>
         </div>        

@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.contrib.auth.models import AbstractUser
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -6,7 +6,6 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 
 from .forms import ManagerRegistrationForm, RenterRegistrationForm, UserForm, UserEditForm, ManagerProfileEditForm, RenterProfileEditForm
-
 from .models import ManagerProfile, RenterProfile, User
 
 from payments.models import UserWallet
@@ -242,4 +241,3 @@ def profile_edit(request):
     return render(request, 'accounts/profile_edit.html', context)
 
 
-# NEW LISTING VIEW

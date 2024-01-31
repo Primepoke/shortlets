@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{# Load the tag library #}
+{% load django_bootstrap5 %}
+
+
+{% block title %}New Listing{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <div class="row justify-content-md-center">
+            <div class="col col-lg-2"></div>
+            <div class="col-md-auto">  
+                <div class="card border-success">
+                    <div class="card-body">
+                        <h1>Search Results</h1>
+    
+                        {% if properties %}
+                        <p>Results for Properties containing "{{ query }}"</p>
+                            <ul>
+                                {% for property in properties %}
+                                    <li><a href="{% url 'listing_details' listing_id=property.id %}">{{ property.title }}</a> - {{ property.description }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% elif users %}
+                        <p>Results for Users who match "{{ query }}"</p>
+                            <ul>
+                                {% for user in users %}
+                                    <li><a href="{% url 'profile' username=user.username %}">{{ user.username }}</a> - {{ user.manager.about }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>There are no results for {{ query }}. Try another search query.</p>
+                        {% endif %}
+                    </div>
+                </div>  
+               
+            </div>
+            <div class="col col-lg-2"></div>
+        </div>        
+    </div>
+
+{% endblock %}
+
+
+
+
+
+

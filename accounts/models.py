@@ -7,7 +7,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 
 class User(AbstractUser):
-    age = models.CharField(max_length=20, choices=[('18-30', '18-30'), ('31-45', '31-45'), ('46-60', '46-60'), ('61+', '61 and above')], default='18-30', help_text="Select age bracket")
+    age = models.CharField(max_length=20, choices=[('18-30', '18-30'), ('31-45', '31-45'), ('46-60', '46-60'), ('61+', '61 and above')], default='31-45', help_text="Select age bracket")
     phone_number = PhoneNumberField(help_text="Enter your phone number")
     gender = models.CharField(max_length=20, choices=[('male', 'Male'), ('female', 'Female')], default='male', help_text="Select your gender")
 

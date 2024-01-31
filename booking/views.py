@@ -9,7 +9,7 @@ from .forms import BookingForm, LoginCheckForm, AvailabilityForm
 from .utils import is_property_available
 from datetime import date
 
-from accounts.models import RenterProfile
+from accounts.models import ManagerProfile, RenterProfile
 from property.models import Property
 from payments.forms import ConfirmBookingForm
 
@@ -37,7 +37,7 @@ def check_availability(request, property_id):
                 messages.success(request, message)
                 return redirect(reverse('listing_details', args=[property_id]))
             else:
-                messages.success(request, message)
+                messages.warning(request, message)
                 return redirect(reverse('listing_details', args=[property_id]))
     else:
         form = AvailabilityForm()
@@ -248,17 +248,28 @@ def is_manager(user):
 @user_passes_test(is_manager)
 def manager_bookings_view(request):
     user = request.user
+    manager = get_object_or_404(ManagerProfile, user=user)
 
-    properties = Property.objects.filter(user=user)
-    bookings = properties.bookings.all().order_by('-check_in_datetime')
+    properties = Property.objects.filter(property_manager=manager)
+    booking = Booking.objects.filter
+
+    bookings = []
+    for property in properties:
+        try:
+            booking = get_object_or_404(Booking, property=property)
+            bookings.append(booking)
+        except:
+            pass
     
     current_bookings = []
     past_bookings = []
-    for booking in bookings:
-        if date.today() < booking.check_out_datetime.date():
-            current_bookings.append(booking)
-        else:
-            past_bookings.append(booking)
+    print(bookings)
+    if bookings:
+        for booking in bookings:
+            if date.today() < booking.check_out_datetime.date():
+                current_bookings.append(booking)
+            else:
+                past_bookings.append(booking)
 
     context = {
         'properties': properties,

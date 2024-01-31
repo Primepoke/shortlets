@@ -4,8 +4,14 @@ from django.shortcuts import get_object_or_404, render, redirect
 from .forms import PropertyForm
 from .models import Property
 
+
 from accounts.models import ManagerProfile
 from reviews.models import Review
+
+# from elasticsearch import Elasticsearch
+# from elasticsearch_dsl import Search
+
+# client = Elasticsearch()
 
 # Create your views here.
 
@@ -58,3 +64,4 @@ def listing_details(request, listing_id):
         context = {'property': property}
 
     return render(request, 'property/listing_detail.html', context)
+

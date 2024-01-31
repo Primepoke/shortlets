@@ -35,17 +35,6 @@ AUTH_USER_MODEL = 'accounts.User'
 # Application definition
 
 INSTALLED_APPS = [
-    # my apps
-    'accounts',
-    'booking',
-    'property',
-    'payments',
-    # 'reports',
-    'reviews',
-    # third-party apps
-    'django_bootstrap5',
-    'django.contrib.humanize',
-    'phonenumber_field',
     # django apps
     'django.contrib.admin',
     'django.contrib.auth',
@@ -53,6 +42,20 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # my apps
+    'accounts',
+    'booking',
+    'property',
+    'payments',
+    'reports',
+    'reviews',
+    'search',
+
+    # third-party apps
+    'django_bootstrap5',
+    'django_elasticsearch_dsl',
+    'phonenumber_field',
 ]
 
 MIDDLEWARE = [
@@ -143,6 +146,7 @@ PAYSTACK_PUBLIC_KEY = ""
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'static'
 
 # Media Settings
 MEDIA_URL = '/media/'
@@ -153,3 +157,11 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+# Search Engine Settings
+ELASTICSEARCH_DSL={
+    'default': {
+        'hosts': 'http://localhost:9200',
+        # 'http_auth': ('username', 'password')
+    }
+}

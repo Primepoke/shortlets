@@ -1,5 +1,5 @@
 from django.db import models
-from django.utils import timezone
+# from django.utils import timezone
 import secrets
 from .paystack import Paystack
 
@@ -12,7 +12,10 @@ class UserWallet(models.Model):
     manager_profile = models.OneToOneField(ManagerProfile, on_delete=models.CASCADE, null=True, related_name='wallet')
     currency = models.CharField(max_length=50, default='NGN')
     balance = models.PositiveIntegerField(default=0)
-    created_at = models.DateTimeField(default=timezone.now, null=True)
+    # created_at = models.DateTimeField(default=timezone.now, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    bank_name = models.CharField(max_length=50, default='ABC')
+    account_number = models.CharField(max_length=50, default='0000000000')
 
     def __str__(self):
         return f"Wallet for {self.manager_profile.user.username}"

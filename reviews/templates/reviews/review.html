@@ -11,16 +11,21 @@
         <div class="row justify-content-md-center">
             <div class="col col-lg-2"></div>
             <div class="col-md-auto">
-                {% if is_renter_flag %}    
-                    <form action="{% url 'create_review' property_id=property.id %}" method="post" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        {% bootstrap_form form %}
-                        {% bootstrap_button button_type="submit" content="Post Review" %}
-                    </form>
-                {% else %}
-                    <p>You haven't booked and stayed in this appartment. You cannot review it.</p>
-                    <p>Return to the <a href="{% url 'listing_details' listing_id=property.id %}">Property page</a></p>
-                {% endif %}
+
+                <div class="card border-success">
+                    <div class="card-header">
+                        {% if is_renter_flag %}    
+                            <form action="{% url 'create_review' property_id=property.id %}" method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                {% bootstrap_form form %}
+                                {% bootstrap_button button_type="submit" content="Post Review" %}
+                            </form>
+                        {% else %}
+                            <p>You haven't booked and stayed in this appartment. You cannot review it.</p>
+                            <p>Return to the <a href="{% url 'listing_details' listing_id=property.id %}">Property page</a></p>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
             <div class="col col-lg-2"></div>
         </div>        

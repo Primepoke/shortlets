@@ -12,17 +12,36 @@
             <div class="col col-lg-2"></div>
             <div class="col-md-auto">
                 {% if is_manager_flag %}
-                    <p>Review by {{ review.renter | title }}</p>
-                    <p>{{ review.title | title }}</p>
-                    <p>{{ review.rating | title }} stars</p>
-                    <p>{{ review.comment | title }}</p>
+
+                    <div class="card border-success">
+                        <div class="card-header">
+                            <h5 class="card-title">Review by {{ review.renter | title }}</h5>
+                        </div>
+                        <div class="card-body">
+                        
+                        <p class="card-text">{{ review.title | title }}.</p>
+                        <p class="card-text">{{ review.rating | title }} stars</p>
+                        <p class="card-text">{{ review.comment | title }}</p>
+                        </div>
+                    </div>
+                    <br>
+
+                    <div class="card border-success">
+                        <div class="card-header">
+                            <h5 class="card-title">Your Response</h5>
+                        </div>
+                        <div class="card-body">
+                        
+                        <p class="card-text">
+                            <form action="{% url 'respond_to_review' review_id=review.id %}" method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                {% bootstrap_form form %}
+                                {% bootstrap_button button_type="submit" content="Post Response" %}
+                            </form>
+                        </p>
+                        </div>
+                    </div>
                     
-                    <h4>Your Response</h4>
-                    <form action="{% url 'respond_to_review' review_id=review.id %}" method="post" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        {% bootstrap_form form %}
-                        {% bootstrap_button button_type="submit" content="Post Response" %}
-                    </form>
                 {% else %}
                     <p>You haven't booked and stayed in this appartment. You cannot review it.</p>
                     <p>Return to the <a href="{% url 'listing_details' listing_id=property.id %}">Property page</a></p>

@@ -8,7 +8,7 @@ from .models import Property
 class PropertyForm(forms.ModelForm):
     class Meta:
         model = Property
-        fields = ['title', 'video', 'video2', 'image', 'image2', 'image3', 'image4', 'image5', 'description', 'address', 'city', 'state', 'zip_code', 'country', 'price_per_night', 'parlours', 'bedrooms', 'bathrooms', 'guests_capacity', 'features', 'is_available']
+        fields = ['title', 'description', 'property_type', 'address', 'city', 'state', 'zip_code', 'country', 'price_per_night', 'parlours', 'bedrooms', 'bathrooms', 'guests_capacity', 'features', 'video', 'video2', 'image', 'image2', 'image3', 'image4', 'image5', 'is_available']
         widgets = {
             'features': forms.CheckboxSelectMultiple,
         }

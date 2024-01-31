@@ -43,14 +43,14 @@ class ManagerRegistrationForm(forms.ModelForm):
 
     class Meta:
         model = ManagerProfile
-        fields = ['company_name', 'contact_email', 'image', 'about']
+        fields = ['company_name', 'contact_email', 'image', 'about', 'twitter', 'linkedIn', 'facebook', 'instagram', 'tiktok']
 
 
 class RenterRegistrationForm(forms.ModelForm):
 
     class Meta:
         model = RenterProfile
-        fields = ['occupation', 'job_title', 'emergency_contact_name', 'emergency_contact_phone', 'preferred_contact_method', 'image']
+        fields = ['occupation', 'job_title', 'emergency_contact_name', 'emergency_contact_phone', 'preferred_contact_method', 'image', 'twitter', 'linkedIn', 'facebook', 'instagram', 'tiktok']
 
 
 

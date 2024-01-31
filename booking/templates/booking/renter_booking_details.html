@@ -14,17 +14,20 @@
         <div class="row justify-content-md-center">
             <div class="col col-lg-2"></div>
             <div class="col-md-auto">
-                <div>
-                    <h3>Booking Details for Booking #{{ booking.id }}</h3>
-                    <p>Property title: {{ booking.property.title }}</p>
-                    <p>Check-in Date & Time: {{ booking.check_in_datetime }}</p>
-                    <p>Check-out Date & Time: {{ booking.check_out_datetime }}</p>
-                    <p>Total Price for Booking: {{ booking.total_price }}</p>
-                    {% if booking.confirmation_status == 'confirmed' %}
-                        <p> Booking Status: {{ booking.confirmation_status | title }}</p>
-                    {% elif booking.confirmation_status == 'cancelled' %}
-                        <p>Booking Status: {{ booking.confirmation_status | title }}</p>
-                    {% endif %}
+                <div class="card border-success ">
+                    <div class="card-body">
+                        <h3>Booking Details for Booking #{{ booking.id }}</h3>
+                        <p>Property title: {{ booking.property.title }}</p>
+                        <p>Check-in Date & Time: {{ booking.check_in_datetime }}</p>
+                        <p>Check-out Date & Time: {{ booking.check_out_datetime }}</p>
+                        <p>Total Price for Booking: {{ booking.total_price }}</p>
+                        {% if booking.confirmation_status == 'confirmed' %}
+                            <p> Booking Status: {{ booking.confirmation_status | title }}</p>
+                        {% elif booking.confirmation_status == 'cancelled' %}
+                            <p>Booking Status: {{ booking.confirmation_status | title }}</p>
+                        {% endif %}
+                    </div>
+                
                 </div>
             </div>
             

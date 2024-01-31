@@ -14,12 +14,14 @@
         <div class="row justify-content-md-center">
             <div class="col col-lg-2"></div>
             <div class="col-md-auto">
-                <div>
-                    <form action="{% url 'renter_registration' %}" class="form" method="post" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        {% bootstrap_form form %}
-                        {% bootstrap_button button_type="submit" content="Update Profile" %}
-                    </form>
+                <div class="card border-success " style="width: 22rem;">
+                    <div class="card-body">
+                        <form action="{% url 'renter_registration' %}" class="form" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {% bootstrap_form form %}
+                            {% bootstrap_button button_type="submit" content="Update Profile" %}
+                        </form>
+                    </div>
                 </div>
         
                 <!-- <div><p>Have an account? <a href="{% url 'login' %}">Login here instead.</a></p></div> -->

@@ -1,11 +1,16 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from .models import Payment, UserWallet
 from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required #, user_passes_test
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
+from django.utils.safestring import mark_safe
+
+from .models import Payment, UserWallet
 
 from booking.models import Booking
 from accounts.models import ManagerProfile
+
+from .forms import WalletCreationForm, WalletEditForm
 
 # Create your views here.
 
@@ -72,8 +77,65 @@ def verify_payment(request, ref):
         booking_url = reverse('renter_booking_details', args=[booking_id])
         message = f"Congratulations! Booking and payment successful! <a href='{booking_url}'>Click here to view booking details</a>"
 
-        messages.success(request, message)
+        messages.success(request, mark_safe(message))
         return redirect(reverse('listing_details', args=[booking.property.id]))
     else:
         messages.error(request, "Payment verification failed. Please contact your bank or support.")
         return render(request, 'payment/verify_failed.html')
+
+
+def is_manager(user):
+    # Check if the user is both logged-in and a manager
+    return user.is_authenticated and hasattr(user, 'manager') 
+
+def create_wallet(request):
+    user = request.user
+
+    if not is_manager(user):
+        messages.error(request, 'Only property managers can create a wallet.')
+        return redirect('login_view')
+
+    manager = get_object_or_404(ManagerProfile, user=user)
+
+    if request.method == 'POST':
+        form = WalletCreationForm(request.POST)
+
+        if form.is_valid():
+            wallet = form.save(commit=False)
+            wallet.manager_profile = manager
+            wallet.save()
+
+            return redirect('view_wallet')
+
+    # create wallet
+    # wallet, created = UserWallet.objects.get_or_create(manager_profile=manager)
+    
+    form = WalletCreationForm()
+
+    return render(request, 'payments/create_wallet.html', {'form': form})
+
+
+@login_required
+def edit_wallet(request, wallet_id):
+    wallet = get_object_or_404(UserWallet, id=wallet_id)
+
+    if request.method == 'POST':
+        form = WalletEditForm(request.POST)
+
+        if form.is_valid():
+            wallet.account_number = form.cleaned_data['account_number']
+            wallet.bank_name = form.cleaned_data['bank_name']
+            wallet.save()
+
+            return redirect('view_wallet')
+    
+    form = WalletEditForm()
+
+    return  render(request, 'payments/edit_wallet.html', {'form': form})
+
+
+@login_required
+def view_wallet(request, wallet_id):
+    wallet = get_object_or_404(UserWallet, id=wallet_id)
+
+    return render(request, 'payments/wallet.html', {'wallet': wallet})

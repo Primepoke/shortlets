@@ -17,4 +17,5 @@ reports/migrations
 reports/__pycache__
 reviews/migrations
 reviews/__pycache__
-reports
+search/__pycache__
+search/migrations
